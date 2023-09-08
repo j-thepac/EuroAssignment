@@ -80,18 +80,20 @@ Are Stored in same Folder
      - Generally, visitor_id is finite in nature.
 8. Considering the substantial size of our dataset, it is imperative to persist intermediate results for optimal performance.
 9. Since our data can be quite extensive, caching it in memory might lead to overflow issues. Therefore, implementing a Checkpoint Direct approach is advisable.
-
-#### **date_time**
-1. Standardize the format in both tables to ensure consistency.
-2. Generate a  date column, exclusively containing "date" values, derived from the date_time attribute.
-3. [Future] This may potentially qualify as a candidate for inclusion as a Dimension, particularly as a Time Period Dimension, in subsequent developments.
-
 #### **visitor_id ( Dimension )**
 1. Convert the data to a string format and subsequently apply a trimming process.
 2. Address and rectify any occurrences of null values within the dataset.
 3. Create a series of natural numbers that serve as unique keys for each distinct visitor_id.
 4. Employ these unique keys as the primary means of joining datasets, as this optimization streamlines subsequent operations.
 5. It is advisable to cache this dataset for the purpose of enhancing operational efficiency in future processes.
+
+#### **date_time ( Dimension )**
+1. Standardize the format in both tables to ensure consistency.
+2. Generate a  date column, exclusively containing "date" values, derived from the date_time attribute.
+3. Qualifies as a candidate for inclusion as a Dimension, particularly as a Time Period Dimension.
+
+
+![dimensionmodel](dimensionModel.png)
 ------------------------------
 ## Task3: Reports
 
@@ -113,6 +115,7 @@ Utilizing the key generated in the preceding step, the two datasets are merged a
 1.Implement a cron job scheduler to regularly poll the folders in consideration, as specified every 10 minutes using above logic.
 2. Ensure that the cron job is configured to handle any potential failures gracefully, with proper logging and alerting mechanisms in place.
 
+![architecture](architecture2.png)
 ### Design 2
 #### Tools : Orchestartion Tool , AirFlow DAG ,Spark Cluster
 
