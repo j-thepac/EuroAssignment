@@ -23,7 +23,7 @@ Used  to ingest the Data for below advantages
     - visitors: Input files from visitors are moved here
 - sparkCache: Store Spark Cache Data
 
-![architecture](Images/architecture.png)
+![architecture](architecture.png)
 --------------------
 ## Task 1: Data Ingestion
 1. Read all files that are given in this assignment 
