@@ -22,6 +22,7 @@ Used  to ingest the Data for below advantages
     - searches: Input files from searches are moved here
     - visitors: Input files from visitors are moved here
 - sparkCache: Store Spark Cache Data
+- python : Source Code  
 
 ![architecture](architecture.png)
 --------------------
@@ -69,17 +70,17 @@ Are Stored in same Folder
 ### Solution Implemented 
 1. Given that data is partitioned for consumption, it should be evenly distributed among each Spark Executor.
 2. In order to minimize multiple reads, the data is cached during the initial reading process, and subsequently cleared after cleansing.
-3. I have thoroughly reviewed the requirements and the requested data.
-4. As per the specifications, we require the following fields from the visitor table: visitor_id, date, region, and country.
-5. From the searches table, we need date and visitor_id.
-6. Among the available columns, visitor_id and date_time hold the utmost significance.
-7. Furthermore, "visitor_id" may be regarded as a dimension.
-     - (Assumption) Typically, visitor_id is auto-generated, maintains uniqueness, and remains static.
+3. As per the specifications, we require the following fields from the visitor table: visitor_id, date, region, and country.
+4. From the searches table, we need date and visitor_id.
+5. Among the available columns, visitor_id and date_time hold the utmost significance.
+6. Furthermore, "visitor_id" and "date" may be regarded as a dimension.
+     - (Assumption) Typically, visitor_id is auto-generated and finite in nature.
+     - maintains uniqueness, and remains static.
      - It is a common attribute shared by both tables.
      - It serves as a key for performing joins.
-     - Generally, visitor_id is finite in nature.
-8. Considering the substantial size of our dataset, it is imperative to persist intermediate results for optimal performance.
-9. Since our data can be quite extensive, caching it in memory might lead to overflow issues. Therefore, implementing a Checkpoint Direct approach is advisable.
+
+7. Considering the substantial size of our dataset, it is imperative to persist intermediate results for optimal performance.
+8. Since our data can be quite extensive, caching it in memory might lead to overflow issues. Therefore, implementing a Checkpoint is advisable.
 #### **visitor_id ( Dimension )**
 1. Convert the data to a string format and subsequently apply a trimming process.
 2. Address and rectify any occurrences of null values within the dataset.
