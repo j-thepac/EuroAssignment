@@ -1,17 +1,15 @@
 # Data Engineering Challenge
 
 ## Goal
-
 - code which injects data **data daily**
 - In **proper structure**.
 
 ## Framework : Pyspark
 Used  to ingest the Data for below advantages
--  MultiCore InMemory Parallel Processing Capablity .
+- MultiCore InMemory Parallel Processing Capablity .
 - Fault Tolerance 
 - High Level API and SQL 
 - Ease of Use 
-
 
 ## Folder Structure 
 - DataLake : Store Data post processing
@@ -25,6 +23,7 @@ Used  to ingest the Data for below advantages
     - visitors: Input files from visitors are moved here
 - sparkCache: Store Spark Cache Data
 
+![architecture](Images/architecture.png)
 --------------------
 ## Task 1: Data Ingestion
 1. Read all files that are given in this assignment 
@@ -59,7 +58,6 @@ Are Stored in same Folder
     Datalake/raw/2020123/xxx2.parq
 
 --------------------
-
 ## Task 2: Preprocessing
 
 1. Consume Data from Lake
@@ -99,50 +97,38 @@ Are Stored in same Folder
 
 Utilizing the key generated in the preceding step, the two datasets are merged and subsequently grouped in order to derive the specified results.By employing the dimension table, end users can attain the desired outcomes.
 
-
 ------------------------------
 ## Task4: Pipeline architecture
--------
-1. multiple large datasets every 10 minutes, 
-2. how do you automatize this task
+
+1. Multiple large datasets every 10 minutes, 
+2. How do you automatize this task
 3. Which tools
 4. which strategy would you use? 
     -  a simple architecture
     - infrastructure of your desired system.
 
 
-### Design 1 
-#### Tools :Cron Job
-1. To implement a cron jon to spool very 10 minsutes on the folders in consideration
-2. Keep a long running Spark Cluster to ingest the Data from Source to DateLake 
+### Design 1 : Cron Job for Folder Spooling:
+#### Tools : Cron Job (Schdeular) , Spark , Lake 
+1.Implement a cron job scheduler to regularly poll the folders in consideration, as specified every 10 minutes using above logic.
+2. Ensure that the cron job is configured to handle any potential failures gracefully, with proper logging and alerting mechanisms in place.
 
 ### Design 2
-#### Tools : Orechestartion Tool , AirFlow DAG
-1. To keep it seperate we can have a Orechestartion tool like Jenkins / Travis to veirfy if there is any new files coming in the folder which would inturn would trigger trigger
-2. 
+#### Tools : Orchestartion Tool , AirFlow DAG ,Spark Cluster
+
+File Monitoring and Jenkins Integration: 
+1. Jenkins can be configured to use webhooks, polling, or other mechanisms to detect changes.
+2. Implement a script within Jenkins that checks for newly added files 
+3. Each time a change is detected , it triggers Aitflow
+
+Airflow DAG for Workflow Orchestration:
+1.  Create an Airflow DAG specifically for the data warehouse pipeline. 
+2. This DAG should consist of multiple tasks that represent different stages of data processing. 
 
 
-
-```mermaid
-  graph TD;
-      A-->B;
-      A-->C;
-      B-->D;
-      C-->D;
-```
-Assuming you get multiple large datasets every 10 minutes, 
-- Cron Job
-- Jenkins / Travis 
-
-how do you automatize this task? 
-- AirFlow Dag with a Cron
-
-- Azure Pipeline 
-
-Which tools, 
-which strategy would you use? 
-Please give us only a simple architecture, including the infrastructure of your desired system.
-
-
-- Cron Job
-- 
+### Design 3
+#### Tools : Consuming from Kafka Cluster   
+Methods to pool Folder for Kafka : 
+1. Periodic Directory Listing:
+Periodically list the contents of the folder you are monitoring (e.g., every few seconds or minutes).Compare the current list of files with the previous list obtained during the previous iteration.
+2. Last FileTimestamp Method : Track of the last modification timestamp last file coming into the folder 
