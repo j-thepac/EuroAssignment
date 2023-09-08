@@ -1,3 +1,4 @@
+
 - large-scale data we are retrieving from our web page and our mobile app via FTP in a **daily batch**.
 - injects these data daily into a datalake in a proper structure.
 
@@ -13,7 +14,9 @@ FTP in a daily batch.
 
 ###  Converting Source to Parq :
 1. parq - compress , structure
-use parquet, partition by date -> highly efficient column-wise compression, retains structure and type information, benefits - less storage more efficient in processing
+use parquet, partition by date -> highly efficient column-wise compression, 
+retains structure and type information,
+ benefits - less storage more efficient in processing
 
 compression="snappy": 
     - Snappy is known for its fast compression and decompression speeds, 
@@ -32,10 +35,11 @@ compression="snappy":
 Task2:
 ------
 some preprocessing I can think of is
-split visit_start and date_time columns into time and date columns
-logged_in can be converted to boolean, hits_avg arounded to a standard decimal precision
-replace nulls with some default
+    split visit_start and date_time columns into time and date columns
+    logged_in can be converted to boolean, hits_avg arounded to a standard decimal precision
+    replace nulls with some default
 
+Assuming 19-2-19 is 2019-2-19
 some dimensions to consider:
 visitor(visitor id)
 geography(country, region)
@@ -47,3 +51,24 @@ group visitors dataset by visitor_id and visit_start_date, get max of visit_star
 
 join with searches dataset on visitor id and visit_start_date = date in searches
 then group by date, coutry and region to get the count of records in the new joined dataframe and thats the req output
+
+
+Test4:
+-------
+
+Assuming you get multiple large datasets every 10 minutes, 
+- Cron Job
+- Jenkins / Travis 
+
+how do you automatize this task? 
+- AirFlow Dag with a Cron
+
+- Azure Pipeline 
+
+Which tools, 
+which strategy would you use? 
+Please give us only a simple architecture, including the infrastructure of your desired system.
+
+
+- Cron Job
+- 

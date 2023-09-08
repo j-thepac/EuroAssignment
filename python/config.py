@@ -10,3 +10,6 @@ class Paths:
     rawVisitors:str
     ezSearches:str
     ezVisitors:str
+    archive:str
+    archiveSearches:str
+    archiveVisitors:str
