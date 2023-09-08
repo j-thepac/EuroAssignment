@@ -108,7 +108,7 @@ Utilizing the key generated in the preceding step, the two datasets are merged a
     - infrastructure of your desired system.
 
 
-### Design 1 : Cron Job for Folder Spooling:
+### Design 1 : Cron Job for Folder Polling:
 #### Tools : Cron Job (Schdeular) , Spark , Lake 
 1.Implement a cron job scheduler to regularly poll the folders in consideration, as specified every 10 minutes using above logic.
 2. Ensure that the cron job is configured to handle any potential failures gracefully, with proper logging and alerting mechanisms in place.
@@ -132,3 +132,4 @@ Methods to pool Folder for Kafka :
 1. Periodic Directory Listing:
 Periodically list the contents of the folder you are monitoring (e.g., every few seconds or minutes).Compare the current list of files with the previous list obtained during the previous iteration.
 2. Last FileTimestamp Method : Track of the last modification timestamp last file coming into the folder 
+3. Since the input is already in JSON format , there is no overhead of converting to serializable format making it suitbale candidate .
