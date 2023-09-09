@@ -183,6 +183,7 @@ result = factSearches\
 .agg(count("*").alias("count")).cache()
 
 # %%
+result.coalesce(1).write.options(header="True").csv("Result")
 sampleDate="(cast('2021-03-05' as date),cast('2021-04-12' as date),cast('2021-01-27' as date),cast('2021-05-02' as date),cast('2021-05-08' as date) )"
 result.filter(f"date in {sampleDate}").show()
 
