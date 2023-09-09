@@ -1,7 +1,7 @@
 # Data Engineering Challenge
 
 ## Goal
-- code which injects data **data daily**
+- Code to ingest **data daily**
 - In **proper structure**.
 
 ## Framework : Pyspark
@@ -26,11 +26,11 @@ Used  to ingest the Data for below advantages
 - sparkCache: Store Spark Cache Data
 - python : Source Code  
 
-# Folder python ( Source Code )
+#  Source Code Folder (python)
 1. Assignment.py / Assignment.ipynb :
     - Both are main files .
     - Both have same code , use can use either based on conviencince .
-    - Assignment.py is created specifiacally for running in container ( but nonethless can be used run locally as well ).
+    - Assignment.py is created specifiacally for running in container ( but nonethless can be used run locally ).
 2. config.py
     - Dataclass
 3. util.py 
@@ -48,6 +48,8 @@ Used  to ingest the Data for below advantages
 3. add relavent files to be ingested into seaches and visitors folders
 4. run python/Assignment.py or Assignment.ipynb 
 
+
+## Architecture 
 ![architecture](architecture.png)
 --------------------
 ## Task 1: Data Ingestion
@@ -73,15 +75,15 @@ I have implemented a logic mechanism to relocate JSON files to an archive folder
 
 ![compress](compress.png)
 
-### Example:
+### Output :
 For input 
 
     visitor-part-01-2020123.json
     visitor-part-02-2020123.json
 Are Stored in same Folder 
 
-    Datalake/raw/2020123/xxx1.parq
-    Datalake/raw/2020123/xxx2.parq
+    Datalake/raw/2020123/xxx1.parquet
+    Datalake/raw/2020123/xxx2.parquet
 
 --------------------
 ## Task 2: Preprocessing
@@ -98,27 +100,31 @@ Are Stored in same Folder
 3. As per the specifications, we require the following fields from the visitor table: visitor_id, date, region, and country.
 4. From the searches table, we need date and visitor_id.
 5. Among the available columns, visitor_id and date_time hold the utmost significance.
-6. Furthermore, "visitor_id" and "date" may be regarded as a dimension.
+6. Furthermore, "visitor_id" and "date" is regarded as a dimension.
      - (Assumption) Typically, visitor_id is auto-generated and finite in nature.
      - maintains uniqueness, and remains static.
      - It is a common attribute shared by both tables.
      - It serves as a key for performing joins.
-     - Also Increases performance because of faster searches (when partionined without Data Skewness)
+     - When natural numbers are used Increases performance because of faster searches 
+     - This can be considered as a LAD or Early Arriving Fact (for future Development)
 
 7. Considering the substantial size of our dataset, it is imperative to persist intermediate results for optimal performance.
 8. Since our data can be quite extensive, caching it in memory might lead to overflow issues. Therefore, implementing a Checkpoint is advisable.
+9. It is important to note that while region and country have been considered as dimensions, they have not been implemented due to their minimal impact on performance. However, they may be considered for future development.
+
 #### **visitor_id ( Dimension )**
 1. Convert the data to a string format and subsequently apply a trimming process.
 2. Address and rectify any occurrences of null values within the dataset.
 3. Create a series of natural numbers that serve as unique keys for each distinct visitor_id.
 4. Employ these unique keys as the primary means of joining datasets, as this optimization streamlines subsequent operations.
 5. It is advisable to cache this dataset for the purpose of enhancing operational efficiency in future processes.
+6. RePartitioning visitor dimension, despite its initial performance degradation, is a one-time process that ultimately yields better performance in the long run .
 
-#### **date_time ( Dimension )**
+#### **date_time ( Period Dimension )**
 1. Standardize the format in both tables to ensure consistency.
 2. Generate a  date column, exclusively containing "date" values, derived from the date_time attribute.
-3. Qualifies as a candidate for inclusion as a Dimension, particularly as a Time Period Dimension.
-
+3. Generate a new table for the date column along with Skeys.
+3. RePartitioning period dimension, despite its initial performance degradation, is a one-time process that ultimately yields better performance in the long run .
 
 ![dimensionmodel](dimensionModel.png)
 ------------------------------
@@ -141,8 +147,10 @@ Utilizing the key generated in the preceding step, the two datasets are merged a
 
 ### Design 1 : Cron Job for Folder Polling:
 #### Tools : Cron Job (Schdeular) , Spark , Lake 
-1.Implement a cron job scheduler to regularly poll the folders in consideration, as specified every 10 minutes using above logic.
+1. Implement a cron job scheduler to regularly poll the folders in consideration, as specified every 10 minutes using above logic.
 2. Ensure that the cron job is configured to handle any potential failures gracefully, with proper logging and alerting mechanisms in place.
+3. As Spark is executed in Cluster mode, extensive performance optimizations can be done in cluster like data locality , Speculation , Resource Scheduling etc., 
+4. Additionally, the Spark cluster can be vertically scaled by augmenting hardware resources and horizontally scaled by expanding the number of worker nodes.
 
 ![architecture](architecture2.png)
 ### Design 2
@@ -183,4 +191,5 @@ Periodically list the contents of the folder you are monitoring (e.g., every few
         #WebUI - localhost:4040
 
 **Execution**
-![docker](docker.png)     
+![docker](docker.png)   
+
