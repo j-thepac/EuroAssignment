@@ -26,7 +26,7 @@ paths:Paths=Paths(
 util.rawZoneSetup(paths)
 
 # %% [markdown]
-# Task 1: Data Ingestion
+#                                                   Task 1: DATA INGESTION
 
 # %%
 spark=SparkSession\
@@ -34,7 +34,7 @@ spark=SparkSession\
 .appName("test")\
 .getOrCreate()
 
-spark.sparkContext.setCheckpointDir("../sparkCache")
+spark.sparkContext.setCheckpointDir("sparkCache")
 
 # %%
 def dataIngestion(srcFolder,targetFolder,archiveFolder):
@@ -46,14 +46,12 @@ def dataIngestion(srcFolder,targetFolder,archiveFolder):
             targetPath=f"{targetFolder}/{ts}/"
             spark.read.json(f"{srcFolder}/{f}").coalesce(1).write.mode("append").options(header="True",compression="snappy").parquet(targetPath)
             os.rename(srcFile,f"{archiveFolder}/{f}")
-            # logging.info(f"Completed dataIngestion {srcFile}")
-
 
 dataIngestion(paths.srcSearches,paths.rawSearches,paths.archiveSearches)
 dataIngestion(paths.srcVisitors,paths.rawVisitors,paths.archiveVisitors)
 
 # %% [markdown]
-# Task 2: Preprocessing
+#                                                       Task 2: PREPROCESSING
 
 # %%
 def cleanVisitor(df:DataFrame)->DataFrame:
@@ -100,13 +98,12 @@ cleanSearchesDF=rawSearchesDF.transform(cleanSearches)
 rawSearchesDF.unpersist()
 
 # %% [markdown]
-# VisitorDimension
+#                                                   VISITOR DIMENSION
 
 # %%
 visitorDimension=cleanVisitorDF.select("visitor_id").distinct().withColumn("visitorkey",monotonically_increasing_id())
 lastKey=visitorDimension.select(max(visitorDimension.visitorkey).alias("max")).first()["max"]
 
-#Getting new IDs in Searches which is not there in Visitor 
 visitorDimension=cleanSearchesDF\
 .select("visitor_id")\
 .distinct()\
@@ -116,15 +113,15 @@ visitorDimension=cleanSearchesDF\
 .union(visitorDimension)\
 .persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
 
-# %%
 factVisitor=cleanVisitorDF.join(visitorDimension,["visitor_id"],"left_outer").persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
 factSearches=cleanSearchesDF.join(visitorDimension,["visitor_id"],"left_outer").persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
-
+# factVisitor=factVisitor.repartitionByRange(20,factVisitor.visitorkey)
+# factSearches=factSearches.repartitionByRange(20,factSearches.visitorkey)
 factVisitor.checkpoint()
 factSearches.checkpoint()
 
 # %% [markdown]
-# PeriodDimension (Date)
+#                                                   PERIOD DIMENSION (Date)
 
 # %%
 peridDimension=cleanVisitorDF.select("date").distinct().withColumn("datekey",monotonically_increasing_id())
@@ -139,30 +136,21 @@ peridDimension=cleanSearchesDF\
 .withColumn("datekey",maxPeriodKey+monotonically_increasing_id()+1)\
 .union(peridDimension)
 
-# %%
 factVisitor=factVisitor.join(peridDimension,["date"],"left_outer").persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
 factSearches=factSearches.join(peridDimension,["date"],"left_outer").persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
-
 factVisitor.checkpoint()
 factSearches.checkpoint()
 
-# %% [markdown]
-# Task3: Reports
-
 # %%
-# Validation to Verify Count source and intermitten result
+#                                               Verify Count source and intermitten result
 assert(rawVisitorDF.count() == factVisitor.count() )
 assert(rawSearchesDF.count() == factSearches.count())
 
+
+# %% [markdown]
+#                                                       Task3: REPORTS
+
 # %%
-# Without Period Dim
-# factVisitorGrouped=factVisitor.groupBy("visitorkey","date",factVisitor.datekey).agg(max("visit_start").alias("visit_start")).cache()
-# factVisitorExtended=factVisitorGrouped\
-#                         .join(factVisitor,["visitorkey","visit_start"])\
-#                         .select("visitorkey","visit_start",factVisitorGrouped.date,factVisitorGrouped.datekey,"country","region")\
-#                         .withColumnRenamed("visit_start","date_time")
-
-
 # With Period Dimesion
 factVisitorGrouped=factVisitor.groupBy("visitorkey",factVisitor.datekey).agg(max("visit_start").alias("visit_start")).cache()
 factVisitorExtended=factVisitorGrouped\
@@ -170,12 +158,8 @@ factVisitorExtended=factVisitorGrouped\
                         .select("visitorkey","visit_start",factVisitorGrouped.datekey,"country","region")\
                         .withColumnRenamed("visit_start","date_time")
 
-
-
-
-
 # %% [markdown]
-# Final Result
+#                                                   FINAL RESULT
 
 # %%
 ## Without Period Dim
@@ -195,11 +179,8 @@ result = factSearches\
 # %%
 sampleDate="(cast('2021-03-05' as date),cast('2021-04-12' as date),cast('2021-01-27' as date),cast('2021-05-02' as date),cast('2021-05-08' as date) )"
 result.filter(f"date in {sampleDate}").show()
-# result.filter(f"date = cast('2021-04-12' as date)").show()
-
 
 # %%
 # country and region not Found  - but should be esp , co
 # cleanVisitorDF.filter(f"date = cast('2021-04-12' as date)").show()
 exit(0)
-
