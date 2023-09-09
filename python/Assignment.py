@@ -40,8 +40,7 @@ spark.sparkContext.setCheckpointDir("sparkCache")
 def dataIngestion(srcFolder,targetFolder,archiveFolder):
     for f in os.listdir(srcFolder):
         srcFile=f"{srcFolder}/{f}"
-        if (".json" not in f):os.remove(srcFile)
-        else:
+        if (".json" in f):
             ts=util.getTsFromFileName(f)
             targetPath=f"{targetFolder}/{ts}/"
             spark.read.json(f"{srcFolder}/{f}").coalesce(1).write.mode("append").options(header="True",compression="snappy").parquet(targetPath)

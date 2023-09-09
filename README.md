@@ -12,7 +12,7 @@ Used  to ingest the Data for below advantages
 - High Level API and SQL 
 - Ease of Use 
 
-## Folder Structure 
+## Project Structure 
 - DataLake : Store Data post processing
     - raw : Extract - Load as parquet
     - ez (future ) : To Store Cleaned Data / Transformed Data / Build Data Warehouse 
@@ -22,8 +22,21 @@ Used  to ingest the Data for below advantages
 - archive : Once Data is processed , input files are archived here
     - searches: Input files from searches are moved here
     - visitors: Input files from visitors are moved here
+
 - sparkCache: Store Spark Cache Data
 - python : Source Code  
+
+# Folder python ( Source Code )
+1. Assignment.py / Assignment.ipynb :
+    - Both are main files .
+    - Both have same code , use can use either based on conviencince .
+    - Assignment.py is created specifiacally for running in container ( but nonethless can be used run locally as well ).
+2. config.py
+    - Dataclass
+3. util.py 
+    - helper functions
+
+## How to Run
 
 ![architecture](architecture.png)
 --------------------
@@ -142,3 +155,22 @@ Methods to pool Folder for Kafka :
 Periodically list the contents of the folder you are monitoring (e.g., every few seconds or minutes).Compare the current list of files with the previous list obtained during the previous iteration.
 2. Last FileTimestamp Method : Track of the last modification timestamp last file coming into the folder 
 3. Since the input is already in JSON format , there is no overhead of converting to serializable format making it suitbale candidate .
+
+## Running using a Docker Container
+### Steps: 
+1. Extract the zip folder locally
+2. In the root directory there are 3 folders :
+    - python :
+    - searches :
+    - visitors :
+3. Add relavent json files for Ingestion in searches and visitors 
+4. Run below commands :
+
+        docker build -t assignment:v1 .
+        docker run -p 4040:4040 assignment:v1 driver python/Assignment.py
+
+
+        #WebUI - localhost:4040
+
+**Execution**
+![docker](docker.png)     
