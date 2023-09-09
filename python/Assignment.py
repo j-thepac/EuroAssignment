@@ -113,10 +113,12 @@ visitorDimension=cleanSearchesDF\
 .union(visitorDimension)\
 .persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
 
+visitorDimension=visitorDimension\
+.repartitionByRange(20,visitorDimension.visitorkey)\
+.persist(storageLevel=StorageLevel.MEMORY_ONLY)
+
 factVisitor=cleanVisitorDF.join(visitorDimension,["visitor_id"],"left_outer").persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
 factSearches=cleanSearchesDF.join(visitorDimension,["visitor_id"],"left_outer").persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
-# factVisitor=factVisitor.repartitionByRange(20,factVisitor.visitorkey)
-# factSearches=factSearches.repartitionByRange(20,factSearches.visitorkey)
 factVisitor.checkpoint()
 factSearches.checkpoint()
 
@@ -135,6 +137,10 @@ peridDimension=cleanSearchesDF\
 .distinct()\
 .withColumn("datekey",maxPeriodKey+monotonically_increasing_id()+1)\
 .union(peridDimension)
+
+peridDimension=peridDimension\
+.repartitionByRange(20,peridDimension.datekey)\
+.persist(storageLevel=StorageLevel.MEMORY_ONLY)
 
 factVisitor=factVisitor.join(peridDimension,["date"],"left_outer").persist(storageLevel=StorageLevel.MEMORY_AND_DISK)
 factSearches=factSearches.join(peridDimension,["date"],"left_outer").persist(storageLevel=StorageLevel.MEMORY_AND_DISK)

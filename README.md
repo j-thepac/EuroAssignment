@@ -6,7 +6,8 @@
 
 ## Framework : Pyspark
 Used  to ingest the Data for below advantages
-- MultiCore InMemory Parallel Processing Capablity .
+- MultiCore  Parallel Processing Capablity .
+- InMemory
 - Fault Tolerance 
 - High Level API and SQL 
 - Ease of Use 
@@ -48,6 +49,8 @@ I have implemented a logic mechanism to relocate JSON files to an archive folder
 4. Utilizing compression can result in a significant reduction in the storage space needed for your data, 
 5. ultimately enhancing data transfer and processing efficiency in distributed environments like Spark clusters.
 
+![compress](compress.png)
+
 ### Example:
 For input 
 
@@ -78,6 +81,7 @@ Are Stored in same Folder
      - maintains uniqueness, and remains static.
      - It is a common attribute shared by both tables.
      - It serves as a key for performing joins.
+     - Also Increases performance because of faster searches (when partionined without Data Skewness)
 
 7. Considering the substantial size of our dataset, it is imperative to persist intermediate results for optimal performance.
 8. Since our data can be quite extensive, caching it in memory might lead to overflow issues. Therefore, implementing a Checkpoint is advisable.
@@ -99,6 +103,8 @@ Are Stored in same Folder
 ## Task3: Reports
 
 Utilizing the key generated in the preceding step, the two datasets are merged and subsequently grouped in order to derive the specified results.By employing the dimension table, end users can attain the desired outcomes.
+
+![performance](performance.png)
 
 ------------------------------
 ## Task4: Pipeline architecture
