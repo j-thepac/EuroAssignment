@@ -44,10 +44,9 @@ I have implemented a logic mechanism to relocate JSON files to an archive folder
 
 #### Format Used : parquet
 1. Retaining the data structure and type information is a key advantage of this approach.
-2. This strategy offers multiple benefits, including reduced storage requirements and improved processing efficiency.
+2. Reduced storage requirements and improved processing efficiency.
 3. When setting the compression "snappy," which offers rapid compression and decompression capabilities.
-4. Utilizing compression can result in a significant reduction in the storage space needed for your data, 
-5. ultimately enhancing data transfer and processing efficiency in distributed environments like Spark clusters.
+4. ultimately enhancing data transfer and processing efficiency in distributed environments like Spark clusters.
 
 ![compress](compress.png)
 
