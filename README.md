@@ -38,6 +38,16 @@ Used  to ingest the Data for below advantages
 
 ## How to Run
 
+### Pre-Req:
+1. python is installed
+2. pyspark is configured 
+
+### steps:
+1. Extract the zip Folder
+2. cd into the Folder extracted
+3. add relavent files to be ingested into seaches and visitors folders
+4. run python/Assignment.py or Assignment.ipynb 
+
 ![architecture](architecture.png)
 --------------------
 ## Task 1: Data Ingestion
